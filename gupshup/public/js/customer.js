@@ -24,105 +24,106 @@ frappe.ui.form.on("Customer", {
       return /^\d{10}$|^\d{12}$|^\d{13}$/.test(mobile);
     }
 
-    frappe.db
-      .get_single_value("Gupshup Whatsapp Settings", "enabled")
-      .then(function (gupshup_enabled_name) {
-        if (gupshup_enabled_name) {
-          frm.add_custom_button(
-            __("Send Whatsapp Message"),
-            function () {
-              let d = new frappe.ui.Dialog({
-                title: "Gupshup Whatsapp",
-                fields: [
-                  {
-                    label: "Send To",
-                    fieldname: "send_to",
-                    fieldtype: "Select",
-                    options: mobileNumbers,
-                  },
-                  {
-                    label: "Type",
-                    fieldname: "type",
-                    fieldtype: "Select",
-                    options: [
-                      "text",
-                      "video",
-                      "audio",
-                      "image",
-                      "file",
-                      "sticker",
-                    ],
-                  },
-                  {
-                    label: "Select Template",
-                    fieldname: "template",
-                    fieldtype: "Link",
-                    options: "Gupshup Whatsapp Templates",
-                    change: function () {
-                      let selectedTemplate = d.get_value("template");
-                      if (selectedTemplate) {
-                        frappe.call({
-                          method: "frappe.client.get_value",
-                          args: {
-                            doctype: "Gupshup SMS Templates",
-                            fieldname: ["message", "dlttemplateid"],
-                            filters: { name: selectedTemplate },
-                          },
-                          callback: function (r) {
-                            if (r && r.message && r.message.message) {
-                              d.set_value("msg", r.message.message);
-                              d.set_value(
-                                "dlttemplateid",
-                                r.message.dlttemplateid
-                              );
-                            }
-                          },
-                        });
-                      }
-                    },
-                  },
-                  {
-                    label: "Message",
-                    fieldname: "msg",
-                    fieldtype: "Long Text",
-                    read_only: 1,
-                  },
-                ],
-                size: "large",
-                primary_action_label: "Send",
-                primary_action(values) {
-                  let msgValue = values.msg;
-                  let dlttemplateidValue = values.dlttemplateid;
-                  let senttoValue = values.send_to;
-                  frappe.call({
-                    method: "gupshup.api.sendWhatsapp",
-                    args: {},
-                    callback: function (r) {},
-                  });
-                  d.hide();
-                },
-              });
-
-              d.show();
-            },
-            __("Gupshup")
-          );
-          frm.add_custom_button(
-            __("Get Whatsapp Templates"),
-            function () {
-              frappe.call({
-                method: "gupshup.api.fetchTemplates",
-                args: {},
-                callback: function (r) {},
-              });
-            },
-            __("Gupshup")
-          );
-        }
-      })
-      .catch(function (error) {
-        console.log("Error fetching gupshup_enabled_name:", error);
-      });
+    // TODO: Create backend handling to send WhatsApp messages
+    // frappe.db
+    //   .get_single_value("Gupshup Whatsapp Settings", "enabled")
+    //   .then(function (gupshup_enabled_name) {
+    //     if (gupshup_enabled_name) {
+    //       frm.add_custom_button(
+    //         __("Send Whatsapp Message"),
+    //         function () {
+    //           let d = new frappe.ui.Dialog({
+    //             title: "Gupshup Whatsapp",
+    //             fields: [
+    //               {
+    //                 label: "Send To",
+    //                 fieldname: "send_to",
+    //                 fieldtype: "Select",
+    //                 options: mobileNumbers,
+    //               },
+    //               {
+    //                 label: "Type",
+    //                 fieldname: "type",
+    //                 fieldtype: "Select",
+    //                 options: [
+    //                   "text",
+    //                   "video",
+    //                   "audio",
+    //                   "image",
+    //                   "file",
+    //                   "sticker",
+    //                 ],
+    //               },
+    //               {
+    //                 label: "Select Template",
+    //                 fieldname: "template",
+    //                 fieldtype: "Link",
+    //                 options: "Gupshup Whatsapp Templates",
+    //                 change: function () {
+    //                   let selectedTemplate = d.get_value("template");
+    //                   if (selectedTemplate) {
+    //                     frappe.call({
+    //                       method: "frappe.client.get_value",
+    //                       args: {
+    //                         doctype: "Gupshup SMS Templates",
+    //                         fieldname: ["message", "dlttemplateid"],
+    //                         filters: { name: selectedTemplate },
+    //                       },
+    //                       callback: function (r) {
+    //                         if (r && r.message && r.message.message) {
+    //                           d.set_value("msg", r.message.message);
+    //                           d.set_value(
+    //                             "dlttemplateid",
+    //                             r.message.dlttemplateid,
+    //                           );
+    //                         }
+    //                       },
+    //                     });
+    //                   }
+    //                 },
+    //               },
+    //               {
+    //                 label: "Message",
+    //                 fieldname: "msg",
+    //                 fieldtype: "Long Text",
+    //                 read_only: 1,
+    //               },
+    //             ],
+    //             size: "large",
+    //             primary_action_label: "Send",
+    //             primary_action(values) {
+    //               let msgValue = values.msg;
+    //               let dlttemplateidValue = values.dlttemplateid;
+    //               let senttoValue = values.send_to;
+    //               frappe.call({
+    //                 method: "gupshup.api.sendWhatsapp",
+    //                 args: {},
+    //                 callback: function (r) {},
+    //               });
+    //               d.hide();
+    //             },
+    //           });
+    //
+    //           d.show();
+    //         },
+    //         __("Gupshup"),
+    //       );
+    //       frm.add_custom_button(
+    //         __("Get Whatsapp Templates"),
+    //         function () {
+    //           frappe.call({
+    //             method: "gupshup.api.fetchTemplates",
+    //             args: {},
+    //             callback: function (r) {},
+    //           });
+    //         },
+    //         __("Gupshup"),
+    //       );
+    //     }
+    //   })
+    //   .catch(function (error) {
+    //     console.log("Error fetching gupshup_enabled_name:", error);
+    //   });
 
     frappe.db
       .get_single_value("Gupshup SMS Settings", "enabled")
@@ -160,7 +161,7 @@ frappe.ui.form.on("Customer", {
                               d.set_value("msg", r.message.message);
                               d.set_value(
                                 "dlttemplateid",
-                                r.message.dlttemplateid
+                                r.message.dlttemplateid,
                               );
                             }
                           },
@@ -203,7 +204,7 @@ frappe.ui.form.on("Customer", {
 
               d.show();
             },
-            __("Gupshup")
+            __("Gupshup"),
           );
           frm.add_custom_button(
             __("Get SMS History"),
@@ -215,7 +216,7 @@ frappe.ui.form.on("Customer", {
                 window.location.href = previousUrl;
               };
             },
-            __("Gupshup")
+            __("Gupshup"),
           );
         }
       })
